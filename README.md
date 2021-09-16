@@ -12,12 +12,12 @@ $ conda install -c conda-forge scikit-learn
 
 ## Requirements
 You'll need Python 3.7 and the following python packages:
-| Package | Version |
-|scikit-learn | 0.24.2 |
-| tensorflow | 1.15.0 |
-| munkres | 1.1.4 |
-| h5py | 2.10.0 |
-| matplotlib | 3.4.2 |
+| Package == Version | \
+|scikit-learn == 0.24.2 | \
+| tensorflow == 1.15.0 | \
+| munkres == 1.1.4 | \
+| h5py == 2.10.0 | \
+| matplotlib == 3.4.2 | \
 
 
 
