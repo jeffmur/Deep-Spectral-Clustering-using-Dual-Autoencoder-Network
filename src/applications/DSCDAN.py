@@ -7,7 +7,6 @@ from keras.layers import Input
 from core.util import print_accuracy,LearningHandler
 from core import Conv
 
-import tensorflow as tf
 def run_net(data, params):
     #
     # UNPACK DATA
@@ -26,7 +25,7 @@ def run_net(data, params):
 
 
     losses_vae = np.empty((500,))
-    for i in range(500):
+    for i in range(params['epochs']):
         # if i==0:
         x_val_y = ConvAE.vae.predict(x_val)[2]
         losses_vae[i] = ConvAE.train_vae(x_val,x_val_y, params['batch_size'])

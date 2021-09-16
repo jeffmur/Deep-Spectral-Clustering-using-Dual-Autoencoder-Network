@@ -116,7 +116,7 @@ def knn_affinity(X, n_nbrs, scale=None, scale_nbr=None, local_scale=None, verbos
     #convert to dense tensor
     W = tf.sparse_tensor_to_dense(W)
     #symmetrize
-    W = (W+tf.transpose(W))/2.0;
+    W = (W+tf.transpose(W))/2.0
 
     return W
 
@@ -133,7 +133,7 @@ def full_affinity(X, scale):
     sigma = K.variable(scale)
     Dx = squared_distance(X)
     sigma_squared = K.pow(sigma, 2)
-    sigma_squared = K.expand_dims(sigma_squared, -1)
+    sigma_squared = expand_dims(sigma_squared, -1)
     Dx_scaled = Dx / (2 * sigma_squared)
     W = K.exp(-Dx_scaled)
     return W

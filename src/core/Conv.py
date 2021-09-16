@@ -2,6 +2,12 @@ from keras.layers import *
 from keras.models import Model
 from keras import backend as K
 import tensorflow as tf
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.9
+config.gpu_options.allow_growth = True
+config.gpu_options.polling_inactive_delay_msecs = 10
+session = tf.compat.v1.Session(config=config)
+import numpy as np
 
 from .layer import stack_layers
 from . import costs
@@ -13,8 +19,6 @@ class ConvAE:
         self.x = x
         self.P = tf.eye(tf.shape(self.x)[0])
         h = x
-
-
 
         filters = params['filters']
         latent_dim = params['latent_dim']
@@ -126,7 +130,7 @@ class ConvAE:
 
         def shuffling(x):
             idxs = K.arange(0, K.shape(x)[0])
-            idxs = K.tf.random_shuffle(idxs)
+            idxs = tf.random_shuffle(idxs)
             return K.gather(x, idxs)
 
         z_shuffle = Lambda(shuffling)(z)
@@ -191,7 +195,7 @@ class ConvAE:
 
             batch_ids = np.random.choice(len(x_unlabeled), size=batch_sizes, replace=False)
             feed_dict[inputs] = x_unlabeled[batch_ids]
-            feed_dict[self.Dy]=x_dy[batch_ids]
+            feed_dict[self.Dy]= x_dy[batch_ids]
 
 
                         # feed_dict[P]=P[batch_ids]
@@ -214,5 +218,6 @@ class Gaussian(Layer):
         z = inputs # z.shape=(batch_size, latent_dim)
         z = K.expand_dims(z, 1)
         return z * 0 + K.expand_dims(self.mean, 0)
+
     def compute_output_shape(self, input_shape):
         return (None, self.num_classes, input_shape[-1])
