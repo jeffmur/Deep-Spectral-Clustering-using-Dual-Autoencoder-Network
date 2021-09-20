@@ -6,7 +6,7 @@ Jeffrey Murray Jr
 ```
 $ conda create -n tf1.15
 $ conda activate tf1.15
-$ conda install h5py==2.10.0 tensorflow-gpu==1.15.0 cudatoolkit==10.0.130 munkres matplotlib
+$ conda install h5py==2.10.0 tensorflow-gpu==1.15.0 cudatoolkit==10.0.130 munkres matplotlib keras
 $ conda install -c conda-forge scikit-learn
 ```
 

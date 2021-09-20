@@ -39,7 +39,7 @@ if args.dset == 'mnist':
         'scale_nbr': 2,                     # neighbor used to determine scale of gaussian graph Laplacian; calculated by
         'batch_size': 512,                 # batch size for spectral net
         'use_approx': False,                # enable / disable approximate nearest neighbors
-        'use_all_data': False,               # enable to use all data for training (no sub set) - default is 10% of mnist
+        'use_all_data': 0.1,               # enable to use all data for training (no sub set) - default is 10% of mnist
         'latent_dim': 120,
         'img_dim': 28,
         'filters': 16

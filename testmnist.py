@@ -45,16 +45,11 @@ def get_mnist(full_dataset):
     '''
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-    # check for true or false entry
-    if type(full_dataset) == bool:
-        if not full_dataset:
-            # Just the top 10% of the dataset
-            # First 600 elements of 6000
-            x_train = x_train[:600]
-            y_train = y_train[:600]
-    else :
-        # otherwise int
-        linear_partition(full_dataset)
+    if not full_dataset:
+        # Just the top 10% of the dataset
+        # First 600 elements of 6000
+        x_train = x_train[:600]
+        y_train = y_train[:600]
 
     x_train = np.expand_dims(x_train, -1) / 255
     x_test = np.expand_dims(x_test, -1) / 255
@@ -76,13 +71,13 @@ def linear_partition(percent_step):
     partition = 1
 
     for label in mnist_labels:
-        print(f"On: {label} with skew of {partition * 100}%")
+        # print(f"On: {label} with skew of {partition * 100}%")
         label_train = x_train[y_train == label]
         skew_train = label_train[:int(partition*len(label_train))]
         label_test = x_test[y_test == label]
         skew_test = label_test[:int(partition*len(label_test))]
-        print(f"Skew Train : {len(skew_train)} / {len(label_train)} ")
-        print(f"Skew Test : {len(skew_test)} / {len(label_test)} ")
+        # print(f"Skew Train : {len(skew_train)} / {len(label_train)} ")
+        # print(f"Skew Test : {len(skew_test)} / {len(label_test)} ")
         partition -= percent_step
 
         # concat result
@@ -93,3 +88,5 @@ def linear_partition(percent_step):
     ry_test = np.where(y_test == label)
 
     return rx_train, ry_train, rx_test, ry_test 
+
+linear_partition(0.1)
