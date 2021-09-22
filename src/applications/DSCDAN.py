@@ -16,7 +16,7 @@ def run_net(data, params):
 
     inputs_vae = Input(shape=(params['img_dim'], params['img_dim'], 1), name='inputs_vae')
     ConvAE = Conv.ConvAE(inputs_vae,params)
-    ConvAE.vae.load_weights('vae_mnist.h5')
+    ConvAE.vae.load_weights('10_percent_leftskew.h5')
 
     lh = LearningHandler(lr=params['spec_lr'], drop=params['spec_drop'], lr_tensor=ConvAE.learning_rate,
                          patience=params['spec_patience'])
@@ -51,7 +51,7 @@ def run_net(data, params):
         # break
     # print training status
 
-    # ConvAE.vae.save_weights('IJCAI_mnist2.h5')
+    # ConvAE.vae.save_weights('10_percent_leftskew.h5')
     # spectral_net.net.save_weight('save.h5')
     # spectral_net.save
     print("finished training")
