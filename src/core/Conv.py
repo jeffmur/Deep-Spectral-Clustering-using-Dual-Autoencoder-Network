@@ -192,6 +192,7 @@ class ConvAE:
             feed_dict = {K.learning_phase(): 1}
 
             # feed corresponding input for each input_type
+            # print(len(x_unlabeled))
 
             batch_ids = np.random.choice(len(x_unlabeled), size=batch_sizes, replace=False)
             feed_dict[inputs] = x_unlabeled[batch_ids]

@@ -46,6 +46,20 @@ if args.dset == 'mnist':
         'filters': 16
         }
     params.update(mnist_params)
+if args.dset == 'usps':
+    usps_params = {
+        'n_clusters': 10,                   # number of clusters in data
+        'n_nbrs': 5,                        # number of nonzero entries (neighbors) to use for graph Laplacian affinity matrix
+        'scale_nbr': 2,                     # neighbor used to determine scale of gaussian graph Laplacian; calculated by
+        'batch_size': 512,                  # batch size for spectral net
+        'use_approx': False,                # enable / disable approximate nearest neighbors
+        'use_all_data': False,              # True: all of usps, False: Only 10% of dataset
+        'sample_size': 90,                  # In Percent for sampling
+        'latent_dim': 96,
+        'img_dim': 16,
+        'filters': 16
+        }
+    params.update(usps_params)
 
 
 data = get_data(params)

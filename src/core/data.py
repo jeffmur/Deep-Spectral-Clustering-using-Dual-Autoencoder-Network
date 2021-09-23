@@ -31,32 +31,29 @@ def load_data(params):
     Convenience function: reads from disk, downloads, or generates the data specified in params
     '''
     if params['dset'] == 'mnist':
-        x_train, x_test, y_train, y_test = get_mnist(params['use_all_data'], params['sample_size'])
+        x_train, x_test, y_train, y_test = get_set(mnist, params)
     elif params['dset'] == 'usps':
-        x_train, x_test, y_train, y_test = get_usps(params['use_all_data'])
+        x_train, x_test, y_train, y_test = get_set(usps, params)
     else:
         raise ValueError('Dataset provided ({}) is invalid!'.format(params['dset']))
 
     return x_train, x_test, y_train, y_test
 
-def get_usps(full_dataset):
-    (input_train, target_train), (input_test, target_test) = usps.load_data()
-    return -1
-
-def get_mnist(full_dataset, sample_size):
+def get_set(object, params):
     '''
     Returns the train and test splits of the MNIST digits dataset,
     where x_train and x_test are shaped into the tensorflow image data
     shape and normalized to fit in the range [0, 1]
     '''
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    (x_train, y_train), (x_test, y_test) = object.load_data()
+    shape = (0, params['img_dim'], params['img_dim'])
 
     # check for true or false entry
-    if not full_dataset: 
-        if sample_size == 10:
-            x_train, x_test, y_train, y_test = linear_partition(0.1)
-        elif sample_size == 90:
-            x_train, x_test, y_train, y_test = remain_90()
+    if params['full_dataset'] == False: 
+        if params['sample_size'] == 10:
+            x_train, x_test, y_train, y_test = linear_partition(object, 0.1, shape)
+        elif params['sample_size'] == 90:
+            x_train, x_test, y_train, y_test = remain_90(object, shape)
         else: 
             raise "Expected 10 or 90 percent for param['sample_size']" 
 
@@ -65,20 +62,20 @@ def get_mnist(full_dataset, sample_size):
 
     ## Resulting Shape
     print(f"X Training: {np.shape(x_train)}")
-    print(f"Y Testing : {np.shape(x_test)}")
+    print(f"X Testing : {np.shape(x_test)}")
 
     ## What should Y shape be??
     print(f"Y Training: {np.shape(y_train)}")
     print(f"Y Testing : {np.shape(y_test)}")
     return x_train, x_test, y_train, y_test
 
-def remain_90():
+def remain_90(obj, shape):
     print("Using remaining 90%")
     mnist_labels = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    (x_train, y_train), (x_test, y_test) = obj.load_data()
     
-    rx_train = rx_test = np.empty((0, 28,28))
+    rx_train = rx_test = np.empty(shape)
 
     for label in mnist_labels:
         # Only keep 10% of train data
@@ -98,7 +95,7 @@ def remain_90():
 
     return rx_train, rx_test, ry_train, ry_test 
 
-def linear_partition(percent_step):
+def linear_partition(obj, percent_step, shape):
     print(f"NOTE: Left Skew with {percent_step * 100}% linear partition")
     '''
     Input:      step == 10%
@@ -108,9 +105,9 @@ def linear_partition(percent_step):
 
     mnist_labels = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    (x_train, y_train), (x_test, y_test) = obj.load_data()
     
-    rx_train = rx_test = np.empty((0, 28,28))
+    rx_train = rx_test = np.empty(shape)
 
     partition = 1
 
