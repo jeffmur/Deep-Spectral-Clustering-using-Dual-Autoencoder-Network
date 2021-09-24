@@ -2,11 +2,6 @@ from keras.layers import *
 from keras.models import Model
 from keras import backend as K
 import tensorflow as tf
-# config = tf.compat.v1.ConfigProto()
-# config.gpu_options.per_process_gpu_memory_fraction = 0.9
-# config.gpu_options.allow_growth = True
-# config.gpu_options.polling_inactive_delay_msecs = 10
-# session = tf.compat.v1.Session(config=config)
 
 import numpy as np
 from . import util
@@ -26,7 +21,7 @@ class ConvAE:
         filters = params['filters']
         latent_dim = params['latent_dim']
         num_classes = params['n_clusters']
-        for i in range(2):
+        for i in range(int(params['num_layers'] / 2)):
             filters *= 2
 
             h = Conv2D(filters=filters,
@@ -42,20 +37,6 @@ class ConvAE:
 
             h = LeakyReLU(0.2)(h)
 
-        # for i in range(1):
-        #     filters *= 2
-        #     h = Conv2D(filters=filters,
-        #             kernel_size=3,
-        #             strides=2,
-        #             padding='same')(h)
-        #     h = LeakyReLU(0.2)(h)
-        #     h = Conv2D(filters=filters,
-        #             kernel_size=3,
-        #             strides=1,
-        #             padding='same')(h)
-        #     h = LeakyReLU(0.2)(h)
-
-
         h_shape = K.int_shape(h)[1:]
         h = Flatten()(h)
 
@@ -69,7 +50,7 @@ class ConvAE:
         h = Dense(np.prod(h_shape))(h)
         h = Reshape(h_shape)(h)
 
-        for i in range(2):
+        for i in range(int(params['num_layers'] / 2)):
             h = Conv2DTranspose(filters=filters,
                                 kernel_size=3,
                                 strides=1,

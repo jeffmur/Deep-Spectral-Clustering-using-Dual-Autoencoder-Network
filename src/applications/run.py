@@ -30,6 +30,7 @@ params.update(general_params)
 # SET DATASET SPECIFIC HYPERPARAMETERS
 if args.dset == 'mnist':
     mnist_params = {
+        'num_layers': 2,                    # number of layers for ConvAE
         'n_clusters': 10,                   # number of clusters in data
         'n_nbrs': 5,                        # number of nonzero entries (neighbors) to use for graph Laplacian affinity matrix
         'scale_nbr': 2,                     # neighbor used to determine scale of gaussian graph Laplacian; calculated by
@@ -45,12 +46,13 @@ if args.dset == 'mnist':
     params.update(mnist_params)
 if args.dset == 'usps':
     usps_params = {
+        'num_layers': 2,                    # number of layers for ConvAE
         'n_clusters': 10,                   # number of clusters in data
         'n_nbrs': 5,                        # number of nonzero entries (neighbors) to use for graph Laplacian affinity matrix
         'scale_nbr': 2,                     # neighbor used to determine scale of gaussian graph Laplacian; calculated by
-        'batch_size': 512,                  # batch size for spectral net
+        'batch_size': 512,                   # batch size for spectral net
         'use_approx': False,                # enable / disable approximate nearest neighbors
-        'use_all_data': False,              # True: all of usps, False: Only 10% of dataset
+        'use_all_data': True,              # True: all of usps, False: Only 10% of dataset
         'sample_size': 10,                  # In Percent for sampling
         'latent_dim': 120,
         'img_dim': 16,
