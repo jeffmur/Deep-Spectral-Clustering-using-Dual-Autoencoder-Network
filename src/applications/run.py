@@ -7,20 +7,14 @@ from collections import defaultdict
 
 from core.data import get_data
 from DSCDAN import run_net
-import tensorflow as tf
-
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
-assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=str, help='gpu number to use', default='')
-parser.add_argument('--dset', type=str, help='gpu number to use', default='mnist')
+parser.add_argument('--gpu', type=str, help='gpu number to use', default='0')
+parser.add_argument('--dset', type=str, help='dataset name (lowercase)', default='mnist')
 args = parser.parse_args()
 
 # SELECT GPU
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
 params = defaultdict(lambda: None)
 
@@ -28,6 +22,8 @@ params = defaultdict(lambda: None)
 general_params = {
         'dset': args.dset,                  # dataset: reuters / mnist
         'epochs' : 100,
+        'gpu' : int(args.gpu),
+        'load' : False                      # True - Load from weight file (.h5); False save new weight file (.h5) see data_params
         }
 params.update(general_params)
 
@@ -40,10 +36,11 @@ if args.dset == 'mnist':
         'batch_size': 512,                  # batch size for spectral net
         'use_approx': False,                # enable / disable approximate nearest neighbors
         'use_all_data': False,              # True: all of mnist, False: Only 10% of dataset
-        'sample_size': 90,                  # In Percent for sampling
+        'sample_size': 10,                  # In Percent for sampling
         'latent_dim': 120,
         'img_dim': 28,
-        'filters': 16
+        'filters': 16,
+        'weight_file' : '10p_mnist.h5'
         }
     params.update(mnist_params)
 if args.dset == 'usps':
@@ -54,10 +51,11 @@ if args.dset == 'usps':
         'batch_size': 512,                  # batch size for spectral net
         'use_approx': False,                # enable / disable approximate nearest neighbors
         'use_all_data': False,              # True: all of usps, False: Only 10% of dataset
-        'sample_size': 90,                  # In Percent for sampling
-        'latent_dim': 96,
+        'sample_size': 10,                  # In Percent for sampling
+        'latent_dim': 120,
         'img_dim': 16,
-        'filters': 16
+        'filters': 16,
+        'weight_file' : '10p_usps.h5'
         }
     params.update(usps_params)
 
@@ -66,5 +64,3 @@ data = get_data(params)
 
 # RUN EXPERIMENT
 run_net(data, params)
-
-

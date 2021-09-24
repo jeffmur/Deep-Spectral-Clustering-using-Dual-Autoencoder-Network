@@ -3,7 +3,6 @@ train.py: contains all training and prediction backend functions for spectral ne
 '''
 from keras import backend as K
 from .util import make_batches
-import tensorflow as tf
 import numpy as np
 
 def check_inputs(x_unlabeled, x_labeled, y_labeled, y_true):

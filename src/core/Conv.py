@@ -2,13 +2,14 @@ from keras.layers import *
 from keras.models import Model
 from keras import backend as K
 import tensorflow as tf
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.9
-config.gpu_options.allow_growth = True
-config.gpu_options.polling_inactive_delay_msecs = 10
-session = tf.compat.v1.Session(config=config)
-import numpy as np
+# config = tf.compat.v1.ConfigProto()
+# config.gpu_options.per_process_gpu_memory_fraction = 0.9
+# config.gpu_options.allow_growth = True
+# config.gpu_options.polling_inactive_delay_msecs = 10
+# session = tf.compat.v1.Session(config=config)
 
+import numpy as np
+from . import util
 from .layer import stack_layers
 from . import costs
 
@@ -16,6 +17,8 @@ from . import costs
 class ConvAE:
 
     def __init__(self,x,params):
+        util.expand_gpu_mem(params['gpu'])
+
         self.x = x
         self.P = tf.eye(tf.shape(self.x)[0])
         h = x
@@ -23,7 +26,7 @@ class ConvAE:
         filters = params['filters']
         latent_dim = params['latent_dim']
         num_classes = params['n_clusters']
-        for i in range(1):
+        for i in range(2):
             filters *= 2
 
             h = Conv2D(filters=filters,
@@ -39,18 +42,18 @@ class ConvAE:
 
             h = LeakyReLU(0.2)(h)
 
-        for i in range(1):
-            filters *= 2
-            h = Conv2D(filters=filters,
-                    kernel_size=3,
-                    strides=2,
-                    padding='same')(h)
-            h = LeakyReLU(0.2)(h)
-            h = Conv2D(filters=filters,
-                    kernel_size=3,
-                    strides=1,
-                    padding='same')(h)
-            h = LeakyReLU(0.2)(h)
+        # for i in range(1):
+        #     filters *= 2
+        #     h = Conv2D(filters=filters,
+        #             kernel_size=3,
+        #             strides=2,
+        #             padding='same')(h)
+        #     h = LeakyReLU(0.2)(h)
+        #     h = Conv2D(filters=filters,
+        #             kernel_size=3,
+        #             strides=1,
+        #             padding='same')(h)
+        #     h = LeakyReLU(0.2)(h)
 
 
         h_shape = K.int_shape(h)[1:]
@@ -92,7 +95,7 @@ class ConvAE:
         W = costs.knn_affinity(z_mean, params['n_nbrs'], scale=2.62, scale_nbr=params['scale_nbr'])
         W = W - self.P
 
-        self.Dy = tf.placeholder(tf.float32, [None, 10], name='Dy')
+        self.Dy = tf.compat.v1.placeholder(tf.float32, [None, 10], name='Dy')
 
      
         z = Input(shape=(latent_dim,))
@@ -107,7 +110,7 @@ class ConvAE:
 
 
         layers = [
-                  {'type': 'Orthonorm', 'name':'orthonorm'}
+                {'type': 'Orthonorm', 'name':'orthonorm'}
                   ]
 
         outputs = stack_layers(y,layers)
@@ -130,7 +133,7 @@ class ConvAE:
 
         def shuffling(x):
             idxs = K.arange(0, K.shape(x)[0])
-            idxs = tf.random_shuffle(idxs)
+            idxs = tf.random.shuffle(idxs)
             return K.gather(x, idxs)
 
         z_shuffle = Lambda(shuffling)(z)
@@ -164,7 +167,7 @@ class ConvAE:
         loss_vae = lamb * K.sum(xent_loss) + lamb * K.sum(xent1_loss)+1.5*K.sum(kl_loss)+1*K.sum(cat_loss)+0.001*K.sum(global_info_loss)
         self.loss=(loss_SPNet+loss_vae)
         self.learning_rate = tf.Variable(0., name='spectral_net_learning_rate')
-        self.train_step1 = tf.train.AdamOptimizer().minimize(self.loss,var_list=self.vae.weights)
+        self.train_step1 = tf.compat.v1.train.AdamOptimizer().minimize(self.loss,var_list=self.vae.weights)
         K.get_session().run(tf.variables_initializer(self.vae.trainable_weights))
 
     def train_vae(self, x_train_unlabeled,x_dy,batch_size):
@@ -199,7 +202,7 @@ class ConvAE:
             feed_dict[self.Dy]= x_dy[batch_ids]
 
 
-                        # feed_dict[P]=P[batch_ids]
+            # feed_dict[P]=P[batch_ids]
 
             all_vars = return_var + updates
             return_vars_ += np.asarray(K.get_session().run(all_vars, feed_dict=feed_dict)[:len(return_var)])

@@ -112,9 +112,9 @@ def knn_affinity(X, n_nbrs, scale=None, scale_nbr=None, local_scale=None, verbos
     #assemble the sparse Weight matrix
     W = tf.SparseTensor(indices=tf.cast(indices, dtype='int64'), values=affVals, dense_shape=tf.cast(tf.shape(Dx), dtype='int64'))
     #fix the ordering of the indices
-    W = tf.sparse_reorder(W)
+    W = tf.sparse.reorder(W)
     #convert to dense tensor
-    W = tf.sparse_tensor_to_dense(W)
+    W = tf.sparse.to_dense(W)
     #symmetrize
     W = (W+tf.transpose(W))/2.0
 

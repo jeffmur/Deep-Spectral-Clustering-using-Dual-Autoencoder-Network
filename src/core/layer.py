@@ -17,10 +17,13 @@ def orthonorm_op(x, epsilon=1e-7):
     returns:    a d x d matrix, ortho_weights, which orthogonalizes x by
                 right multiplication
     '''
+    # print(tf.shape(x))
     x_2 = K.dot(K.transpose(x), x)
     x_2 += K.eye(K.int_shape(x)[1])*epsilon
-    L = tf.cholesky(x_2)
-    ortho_weights = tf.transpose(tf.matrix_inverse(L)) * tf.sqrt(tf.cast(tf.shape(x)[0], dtype=K.floatx()))
+    # print(tf.shape(x_2))
+    # print(x_2)
+    L = tf.linalg.cholesky(x_2)
+    ortho_weights = tf.transpose(tf.linalg.inv(L)) * tf.sqrt(tf.cast(tf.shape(x)[0], dtype=K.floatx()))
     return ortho_weights
 
 def Orthonorm(x, name=None):
@@ -40,10 +43,9 @@ def Orthonorm(x, name=None):
     # create variable that holds this matrix
     ortho_weights_store = K.variable(np.zeros((d,d)))
     # create op that saves matrix into variable
-    ortho_weights_update = tf.assign(ortho_weights_store, ortho_weights, name='ortho_weights_update')
+    ortho_weights_update = tf.compat.v1.assign(ortho_weights_store, ortho_weights, name='ortho_weights_update')
     # switch between stored and calculated weights based on training or validation
     l = Lambda(lambda x: K.in_train_phase(K.dot(x, ortho_weights), K.dot(x, ortho_weights_store)), name=name)
-
     l.add_update(ortho_weights_update)
     return l
 
@@ -101,7 +103,7 @@ def stack_layers(inputs, layers, kernel_initializer='glorot_uniform'):
         elif layer['type'] == 'Flatten':
             l = Flatten(name=layer.get('name'))
         elif layer['type'] == 'Orthonorm':
-            l = Orthonorm(outputs, name=layer.get('name'));
+            l = Orthonorm(outputs, name=layer.get('name'))
         else:
             raise ValueError("Invalid layer type '{}'".format(layer['type']))
 
