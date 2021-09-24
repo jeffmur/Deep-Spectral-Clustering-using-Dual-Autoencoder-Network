@@ -49,7 +49,7 @@ def get_set(object, params):
     shape = (0, params['img_dim'], params['img_dim'])
 
     # check for true or false entry
-    if params['full_dataset'] == False: 
+    if params['use_all_data'] == False: 
         if params['sample_size'] == 10:
             x_train, x_test, y_train, y_test = linear_partition(object, 0.1, shape)
         elif params['sample_size'] == 90:
@@ -58,7 +58,7 @@ def get_set(object, params):
             raise "Expected 10 or 90 percent for param['sample_size']" 
     else: 
         print(f"Using FULL {object.__name__}")
-        
+
     x_train = np.expand_dims(x_train, -1) / 255
     x_test = np.expand_dims(x_test, -1) / 255
 
